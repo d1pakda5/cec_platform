@@ -1,0 +1,38 @@
+<?php
+include("config.php");
+$ip = $_SERVER['REMOTE_ADDR'];
+
+$day = isset($_GET['day']) && $_GET['day']!='' ? mysql_real_escape_string($_GET['day']) : '01';
+$month = isset($_GET['month']) && $_GET['month']!='' ? mysql_real_escape_string($_GET['month']) : date("m");
+$dtFrom = date("2017-".$month."-01 00:00:00");
+$dtTo = date("2017-".$month."-t 23:59:59", strtotime("2017-".$month."-01"));
+
+$query = $db->query("SELECT SUM(amount) AS sum_amount, SUM(surcharge) AS sum_surcharge FROM gst_monthwise ");
+$result = $db->fetchNextObject($query);
+
+echo $result->sum_amount;
+echo "<br>";
+echo $result->sum_surcharge;
+
+echo "<br>";
+echo "<br>";
+
+$query1 = $db->query("SELECT SUM(rch_amount) AS sum_amount FROM gst_monthly_txns WHERE user_type IN (1,5) ");
+$result1 = $db->fetchNextObject($query1);
+
+echo $result1->sum_amount;
+echo "<br><br><br>";
+echo "API user<br>";
+$query2 = $db->query("SELECT 
+	SUM(IF(bill_type='1', rch_amount, 0)) AS p2p, 
+	SUM(IF(bill_type='2', rch_amount, 0)) AS p2a, 
+	SUM(IF(bill_type='3', rch_amount, 0)) AS p2s 
+	FROM gst_monthly_txns WHERE user_type='5' ");
+$result2 = $db->fetchNextObject($query2);
+
+echo $result2->p2p;
+echo "<br>";
+echo $result2->p2a;
+echo "<br>";
+echo $result2->p2s;
+echo "<br>";

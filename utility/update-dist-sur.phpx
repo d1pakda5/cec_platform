@@ -1,0 +1,19 @@
+<?php
+include("config.php");
+$ip = $_SERVER['REMOTE_ADDR'];
+$scnt = 0;
+//
+$rows = [];
+$query = $db->query("SELECT * FROM gst_monthly_txns WHERE user_type='5' AND bill_type='3' ORDER BY id ASC LIMIT 1000");
+while($result = $db->fetchNextObject($query)) {
+	$rows[] = $result;
+}
+foreach($rows as $row) {	
+	$id = $row->id + 1;
+	//echo $id;
+	$txn = $db->queryUniqueObject("SELECT * FROM gst_monthly_txns WHERE id='".$id."'");
+	if($txn) {
+		$db->execute("UPDATE `gst_monthly_txns` SET `comm_per`='".$row->comm_per."', `rch_comm_value`='".$row->rch_comm_value."', `taxable_value`='".$row->taxable_value."', `gst_rate`='".$row->gst_rate."', `gst_net`='".$row->gst_net."', `gst_tax`='".$row->gst_tax."', `gst_amount_deduct`='".$row->gst_amount_deduct."', is_update='1' WHERE id='".$txn->id."' ");		
+	}		
+	//echo "<hr>";	
+}

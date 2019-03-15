@@ -1,0 +1,9 @@
+<?php
+include("config.php");
+$ip = $_SERVER['REMOTE_ADDR'];
+
+$query = $db->query("SELECT * FROM gst_monthwise WHERE user_type='0' ORDER BY id ASC LIMIT 500");
+while($result = $db->fetchNextObject($query)) {
+	$operator_info = $db->queryUniqueObject("SELECT * FROM operators WHERE operator_id='".$result->operator_id."'");
+	$comm_info = $db->queryUniqueObject("SELECT * FROM operators WHERE operator_id='".$result->operator_id."'");
+}

@@ -1,0 +1,9 @@
+MIDlet-1: ErechargeAsia,,com.bonrix.recharge.RechargeMidlet
+MIDlet-Jar-Size: 41056
+MIDlet-Jar-URL: ErechargeAsia.jar
+MIDlet-Name: ErechargeAsia
+MIDlet-Permissions: javax.microedition.io.Connector.http
+MIDlet-Vendor: Bonrix
+MIDlet-Version: 1.0.0
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0

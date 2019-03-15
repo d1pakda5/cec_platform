@@ -1,0 +1,40 @@
+<?php
+include("config.php");
+$ip = $_SERVER['REMOTE_ADDR'];
+$scnt = 0;
+//
+$rows = [];
+$query = $db->query("SELECT * FROM gst_monthly_txns WHERE user_type='4' AND is_update='0' AND bill_type!='3' ORDER BY id ASC LIMIT 500");
+while($result = $db->fetchNextObject($query)) {
+	$rows[] = $result;
+}
+//
+foreach($rows as $row) {
+	//$operator_info = $db->queryUniqueObject("SELECT * FROM operators WHERE operator_id='".$row->operator_id."' ");
+	$amount = $row->rch_amount;
+	$surcharge = $row->surcharge;
+	$rch_date = $row->rech_date;
+	$operator_id = $row->operator_id;
+	$billing_type = $row->bill_type;
+	$item_group = $row->item_group;
+	//
+	$sCommission = getDistCommission(trim($row->uid),$row->operator_id,$amount,$billing_type);
+	 
+	if($billing_type=='3') {
+		$rch_comm_type = '1';
+		$rch_comm_value = $surcharge;
+		$rch_ds_comm_value = '0';
+	} else {
+		$rch_comm_type = '0';
+		$rch_comm_value = $sCommission['rtCom'];
+		$rch_ds_comm_value = $sCommission['dsCom'];
+	}
+	
+	$taxDs = getGstTxnsForDist($billing_type,$rch_ds_comm_value,$rch_comm_type);
+	
+	$db->execute("UPDATE `gst_monthly_txns` SET `comm_per`='".$sCommission['dsPer']."', `rch_comm_value`='".$rch_ds_comm_value."', `taxable_value`='".$taxDs['taxable_comm']."', `gst_rate`='".$taxDs['gst_rate']."', `gst_net`='".$taxDs['net_comm']."', `gst_tax`='".$taxDs['gst_tax']."', `gst_amount_deduct`='".$taxDs['gst_amount']."', is_update='1' WHERE id='".$row->id."' ");	
+	//print_r("UPDATE `gst_monthly_txns` SET `comm_per`='".$sCommission['dsPer']."', `rch_comm_value`='".$rch_ds_comm_value."', `taxable_value`='".$taxDs['taxable_comm']."', `gst_rate`='".$taxDs['gst_rate']."', `gst_net`='".$taxDs['net_comm']."', `gst_tax`='".$taxDs['gst_tax']."', `gst_amount_deduct`='".$taxDs['gst_amount']."', is_update='1' WHERE id='".$row->id."' ");
+	
+	echo $scnt++;
+	echo "<hr>";
+}
